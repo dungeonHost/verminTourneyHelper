@@ -19,7 +19,10 @@ def pickImage(pictures,fullPic):
 	global lIndex
 	
 	h,w,_=fullPic.shape
-	fpic=cv2.resize(fullPic,(int(400*(w/h)),400))
+	if(w<h):
+		fpic=cv2.resize(fullPic,(400,int(400*(w/h))))
+	else:
+		fpic=cv2.resize(fullPic,(int(400*(w/h)),400))
 	cv2.imshow("fullPic",fpic)
 	lIndex=0
 	labelText=["pick evo1 sprite","pick evo2 sprite","pick evo3 sprite","pick evo1 blast","pick evo2 blast","pick evo3 blast","pick any extra images"]
@@ -55,6 +58,7 @@ def imageSelect(index,pictures,picToKeep,labelText,label,root):
 		print("INDEX="+str(index))
 		picToKeep.append(pictures[index])
 		#cv2.imshow("HI",pictures[index])
+		#cv2.waitKey(0)
 		im=cv2.resize(picToKeep[len(picToKeep)-1],(50,50))
 		pic=Image.fromarray(im)
 		pics[lIndex]=ImageTk.PhotoImage(pic)
@@ -93,7 +97,7 @@ def splitImage(fileName):
 		im[0:w,0:white]=255
 		im[0:white,0:h]=255
 		imgray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
-		(thresh, im_bw) = cv2.threshold(imgray, 245, 255, cv2.THRESH_BINARY)
+		(thresh, im_bw) = cv2.threshold(imgray, 254, 255, cv2.THRESH_BINARY)
 		ret, thresh = cv2.threshold(imgray, 254, 255, cv2.THRESH_BINARY_INV)
 		ret, im_th = cv2.threshold(imgray, 254, 255, cv2.THRESH_BINARY_INV)
 		im_floodfill=im_th.copy()
@@ -112,13 +116,17 @@ def splitImage(fileName):
 		else:
 			b,g,r,a=cv2.split(im)
 			#im_out=cv2.bitwise_or(im_out,a)
-			rgba=[b,g,r,a]#im_out]
+			h,w=a.shape
+			if(h*w-np.count_nonzero(a)<=50):
+				rgba=[b,g,r,im_out]#im_out]
+			else:
+				rgba=[b,g,r,a]
 		dst2=cv2.merge(rgba,4)
 		im=dst2
 		w,h,_=im.shape
 		im[0:w,0:white]=(255,255,255,0)
 		im[0:white,0:h]=(255,255,255,0)
-		ret, thresh = cv2.threshold(im_out, 240, 255, cv2.THRESH_BINARY)
+		ret, thresh = cv2.threshold(im_out, 254, 255, cv2.THRESH_BINARY)
 		im2, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 		im3=np.copy(im2)
 		cv2.drawContours(im3,contours,-1,255,3)
@@ -163,7 +171,10 @@ def splitImage(fileName):
 		font = cv2.FONT_HERSHEY_SIMPLEX
 		crop=im[yl:yl+hl,xl:xl+wl]
 		crop_imgs.append(crop)
-		crop=im[yl-2:yl+hl+2,xl-2:xl+wl+2]
+		#crop=im[yl-2:yl+hl+2,xl-2:xl+wl+2]
+		crop=cv2.copyMakeBorder(crop,40,40,40,40,cv2.BORDER_CONSTANT,value=(255,255,255,1))
+		#cv2.imshow("hi",crop)
+		#cv2.waitKey(0)
 		bwCrop=cv2.cvtColor(crop,cv2.COLOR_BGR2GRAY)
 		ret, thresh = cv2.threshold(bwCrop, 240, 255, cv2.THRESH_BINARY)
 		im2, cont, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -172,11 +183,17 @@ def splitImage(fileName):
 		for c in cont:
 			if(i<2):
 				mask=np.zeros_like(bwCrop)
-				cv2.drawContours(mask,cont,i,255,-1)
+				cv2.drawContours(mask,cont,i,255,-1,lineType=8)
+				#cv2.drawContours(mask,cont,i,255,2,lineType=8)
 				out=np.zeros_like(crop)
 				out[mask==255]=crop[mask==255]
+				#cv2.drawContours(out,cont,i,(0,0,0,255),2,lineType=8)
+				w,h,_=out.shape
+				out=out[35:w-35,35:h-35]
 				crop_imgs.append(out)
 				i+=1
+				#cv2.imshow("hi",mask)
+				#cv2.waitKey(0)
 		
 	picToKeep=pickImage(crop_imgs,im)
 	index=0
@@ -189,6 +206,8 @@ def splitImage(fileName):
 			cv2.imwrite(fileName[:-4]+str(index)+".png",r_im)
 			csvStr+=fileName[:-4]+str(index)+".png,"
 			os.chdir("../"+fileName[:-4])
+			#cv2.imshow(fileName[:-4],pic)
+			cv2.waitKey(0)
 		index+=1
 	csvStr+="\n"
 	csvFile.write(csvStr)

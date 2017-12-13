@@ -35,8 +35,8 @@ def createBracket(nRounds,tSize,nPart):
 	for j in range(numRounds-1,1,-1):
 		hsum+=int(prod*((numPartis)**(j-1))*(vertLineDist))
 		print("JFDSF"+str(hsum)+" "+str(prod)+" "+str(j))
-	h=int(hsum+(numPartis-2)*(150*teamSize+2*(horzLineDist)))+vertLineDist+100#*2
-	w=int(bsum)*2+150*(teamSize)+200#ceil((2.4*numRounds)*horzLineDist)+100*teamSize
+	h=int(hsum+(numPartis-2)*(150*teamSize+2*(horzLineDist)))+vertLineDist+100
+	w=int(bsum)*2+150*(teamSize)+200
 	brack=np.ones((h,w,3),np.uint8)*255
 	point=[int(w/2),int(h/2)]
 	startFlag=True
@@ -66,33 +66,29 @@ def createBracket(nRounds,tSize,nPart):
 		populateVertBracket(fp)
 	
 def populateHorzBracket():
-	#csvFile=open("bracket.csv","r+")
-	#h,w,_=bracket.shape
 	point=topPoints[0]
-	point[0]-=50*teamSize#50
-	point[1]-=25#(25+25*(teamSize-1))
+	point[0]-=50*teamSize
+	point[1]-=25
 	cnt=1
 	bracket=cv2.imread("bracket.png",cv2.IMREAD_UNCHANGED)
 	print("StartHorz")
 	fp=open("bracket.csv","r+")
-	#with open("bracket.csv","r+") as fp:
 	for line in fp:
 		splitString=line.split(',')
-		pic=cv2.imread(splitString[0].rstrip(),cv2.IMREAD_UNCHANGED)#splitString[0],cv2.IMREAD_UNCHANGED)
+		pic=cv2.imread(splitString[0].rstrip(),cv2.IMREAD_UNCHANGED)
 		print(splitString[0])
 		alphS=pic[:,:,3]/255.0
 		alphL=1.0-alphS
 		for c in range(0,3):
 			bracket[point[1]:point[1]+50, point[0]:point[0]+50,c]=(alphS*pic[:,:,c]+alphL*bracket[point[1]:point[1]+50, point[0]:point[0]+50,c])
 		if cnt%teamSize==0:
-			point[1]+=int((vertLineDist)/(numPartis-1))#-50*(teamSize-1))#ceil(-2.3333*numPartis**3+29.5*numPartis**2-128.17*numPartis+257)
+			point[1]+=int((vertLineDist)/(numPartis-1))
 			point[0]-=(50*(teamSize-1))
 		else:
 			point[0]+=50
 		if cnt%(numPartis**(numRounds-1)*teamSize)==0:
 			point=topPoints[1]
-			point[1]-=25#(25+25*(teamSize-1))
-			#point[0]+=50*(teamSize-1)
+			point[1]-=25
 			print("switch")
 		if cnt%(2*(numPartis**(numRounds-1)*teamSize))==0:
 			cv2.imwrite("bracket.png",bracket)
@@ -103,9 +99,6 @@ def populateHorzBracket():
 
 def populateVertBracket(fp):
 	point=topPoints[2]
-	#point[1]-=50
-	#point[0]-=(25+25*(teamSize-1))
-	#point[1]-=50*teamSize#50
 	point[0]-=25
 	cnt=1
 	bracket=cv2.imread("bracket.png",cv2.IMREAD_UNCHANGED)
@@ -114,7 +107,7 @@ def populateVertBracket(fp):
 		return
 	for line in fp:
 		splitString=line.split(',')
-		pic=cv2.imread(splitString[0].rstrip(),cv2.IMREAD_UNCHANGED)#splitString[0],cv2.IMREAD_UNCHANGED)
+		pic=cv2.imread(splitString[0].rstrip(),cv2.IMREAD_UNCHANGED)
 		print(splitString[0])
 		alphS=pic[:,:,3]/255.0
 		alphL=1.0-alphS
@@ -123,7 +116,7 @@ def populateVertBracket(fp):
 		alphS=0
 		alphL=0
 		if cnt%teamSize==0:
-			point[0]+=int((vertLineDist)/(numPartis-1))#-50*(teamSize-1))#ceil(-2.3333*numPartis**3+29.5*numPartis**2-128.17*numPartis+257)
+			point[0]+=int((vertLineDist)/(numPartis-1))
 			point[1]-=(50*(teamSize-1))#*dir)
 		else:
 			point[1]+=50
@@ -150,7 +143,7 @@ def drawBrackHorz(x,y,brack,dir,r,hLD):
 	prod=1
 	for i in range(r,1):
 		prod*=i
-	vertDist=int(prod*((numPartis)**(r-1))*(vertLineDist))#(10*(teamSize*(numPartis*r))+10*(r-1))
+	vertDist=int(prod*((numPartis)**(r-1))*(vertLineDist))
 	print("VERT="+str(vertDist)+" r="+str(r)+" blocks="+str(ceil(((3*r-1)/2)**(r-1))))
 	point[1]+=int(vertDist/2)
 	drawLineVert(point,vertDist,-1,brack)
@@ -188,7 +181,7 @@ def drawBrackVert(x,y,brack,dir,r,hLD):
 	prod=1
 	for i in range(r,1):
 		prod*=i
-	vertDist=int(prod*((numPartis)**(r-1))*(vertLineDist))#(10*(teamSize*(numPartis*r))+10*(r-1))
+	vertDist=int(prod*((numPartis)**(r-1))*(vertLineDist))
 	print("VERT="+str(vertDist)+" r="+str(r)+" blocks="+str(ceil(((3*r-1)/2)**(r-1))))
 	point[0]+=int(vertDist/2)
 	drawLineHorz(point,vertDist,-1,brack)
