@@ -19,9 +19,10 @@ def pickImage(pictures,fullPic):
 	global lIndex
 	
 	h,w,_=fullPic.shape
-	if(w<h):
-		fpic=cv2.resize(fullPic,(400,int(400*(w/h))))
-	else:
+	fpic=fullPic
+	if(w<h and w>400):
+		fpic=cv2.resize(fullPic,(400,int(400*(h/w))))
+	elif(h>400):
 		fpic=cv2.resize(fullPic,(int(400*(w/h)),400))
 	cv2.imshow("fullPic",fpic)
 	lIndex=0
@@ -30,7 +31,7 @@ def pickImage(pictures,fullPic):
 	label[0].grid(row=0,column=0)
 	#label[0].pack(side=LEFT)
 	for pic in pictures:
-		pic=cv2.resize(pic,(40,40))
+		pic=cv2.resize(pic,(60,60))
 		im=Image.fromarray(pic)
 		images[index]=ImageTk.PhotoImage(im)
 		butts[index]=Button(root,justify=LEFT)
@@ -86,13 +87,12 @@ def imageSelect(index,pictures,picToKeep,labelText,label,root):
 
 #def closeWindow()
 
-def splitImage(fileName):
+def splitImage(fileName,im):
 	global csvFile
 	repeat=1
 	white=0
 	count=0
 	while(repeat==1):
-		im=cv2.imread(fileName,cv2.IMREAD_UNCHANGED)
 		w,h,_=im.shape
 		im[0:w,0:white]=255
 		im[0:white,0:h]=255
@@ -103,6 +103,8 @@ def splitImage(fileName):
 		im_floodfill=im_th.copy()
 		h,w=im_th.shape[:2]
 		mask=np.zeros((h+2,w+2),np.uint8)
+		
+		#make background transparent
 		cv2.floodFill(im_floodfill,mask,(0,0),255)
 		im_floodfill_inv = cv2.bitwise_not(im_floodfill)
 		im_out = im_th | im_floodfill_inv
@@ -124,6 +126,7 @@ def splitImage(fileName):
 		dst2=cv2.merge(rgba,4)
 		im=dst2
 		w,h,_=im.shape
+		
 		im[0:w,0:white]=(255,255,255,0)
 		im[0:white,0:h]=(255,255,255,0)
 		ret, thresh = cv2.threshold(im_out, 254, 255, cv2.THRESH_BINARY)
@@ -141,6 +144,8 @@ def splitImage(fileName):
 	i=0
 	im2=np.copy(im)
 	largestSquares=list();
+	imSquares=cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+	cv2.drawContours(imSquares,contours,-1,(0,255,0),3)
 	for c in contours:
 		if(len(largestSquares)<25):
 			largestSquares.append(cv2.boundingRect(c))
@@ -157,13 +162,35 @@ def splitImage(fileName):
 					break
 		x,y,w,h = cv2.boundingRect(c)
 		a=(w)*(h)
-		cv2.rectangle(im2,(x,y),(x+w,y+h),(0,255,0),2)
-		font = cv2.FONT_HERSHEY_SIMPLEX
-		cv2.putText(im2,str(i),(x,y+20),font,.5,(0,255,0),1,cv2.LINE_AA)
+		if x>2 and y>2:
+			imSquares[y+2:y-2+h,x+2:x-2+w]=0
+			cv2.floodFill(im_floodfill,mask,(0,0),255)
 		i+=1
 	index=0
 	os.chdir(fileName[:-4])
 	
+	ret, thresh = cv2.threshold(imSquares, 254, 255, cv2.THRESH_BINARY)
+	im2, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+	largeSquares=list();
+	
+	for c in contours:
+		if(len(largeSquares)<10):
+			largeSquares.append(cv2.boundingRect(c))
+			largeSquares.sort(key=lambda ls:ls[2]*ls[3])
+		else:
+			x,y,w,h = cv2.boundingRect(c)
+			a=(w)*(h)
+			for index, ls in enumerate(largeSquares):
+				xl,yl,wl,hl=ls
+				al=(wl)*(hl)
+				if a>al:
+					largeSquares[index]=cv2.boundingRect(c)
+					largeSquares.sort(key=lambda ls:ls[2]*ls[3])
+					break
+	
+	for l in largeSquares:
+		largestSquares.append(l)
+	largestSquares.sort(key=lambda ls:ls[2]*ls[3])
 	crop_imgs=list()
 	for ls in largestSquares:
 		xl,yl,wl,hl=ls
@@ -181,40 +208,40 @@ def splitImage(fileName):
 		cont.sort(key=lambda c:cv2.contourArea(c),reverse=True)
 		i=0
 		for c in cont:
-			if(i<2):
+			if(i==1):
 				mask=np.zeros_like(bwCrop)
 				cv2.drawContours(mask,cont,i,255,-1,lineType=8)
-				#cv2.drawContours(mask,cont,i,255,2,lineType=8)
 				out=np.zeros_like(crop)
 				out[mask==255]=crop[mask==255]
 				#cv2.drawContours(out,cont,i,(0,0,0,255),2,lineType=8)
 				w,h,_=out.shape
 				out=out[35:w-35,35:h-35]
 				crop_imgs.append(out)
-				i+=1
+				break
+			i+=1
 				#cv2.imshow("hi",mask)
 				#cv2.waitKey(0)
-		
-	picToKeep=pickImage(crop_imgs,im)
-	index=0
-	csvStr=""
-	for pic in picToKeep:
-		cv2.imwrite("sprite"+str(index)+".png",pic)
-		if(index<3):
-			r_im=cv2.resize(pic,(50,50))
-			os.chdir("../bracket")
-			cv2.imwrite(fileName[:-4]+str(index)+".png",r_im)
-			csvStr+=fileName[:-4]+str(index)+".png,"
-			os.chdir("../"+fileName[:-4])
-			#cv2.imshow(fileName[:-4],pic)
-			cv2.waitKey(0)
-		index+=1
-	csvStr+="\n"
-	csvFile.write(csvStr)
-	cv2.imwrite(fileName,im)
-	os.chdir("../bracket")
-	cv2.imwrite(fileName,im)
-	cv2.waitKey(0)
+	return crop_imgs
+	# picToKeep=pickImage(crop_imgs,im)
+	# index=0
+	# csvStr=""
+	# for pic in picToKeep:
+		# cv2.imwrite("sprite"+str(index)+".png",pic)
+		# if(index<3):
+			# r_im=cv2.resize(pic,(50,50))
+			# os.chdir("../bracket")
+			# cv2.imwrite(fileName[:-4]+str(index)+".png",r_im)
+			# csvStr+=fileName[:-4]+str(index)+".png,"
+			# os.chdir("../"+fileName[:-4])
+			# #cv2.imshow(fileName[:-4],pic)
+			# cv2.waitKey(0)
+		# index+=1
+	# csvStr+="\n"
+	# csvFile.write(csvStr)
+	# cv2.imwrite(fileName,im)
+	# os.chdir("../bracket")
+	# cv2.imwrite(fileName,im)
+	# cv2.waitKey(0)
 
 if not os.path.exists("bracket"):
 	os.mkdir("bracket")
@@ -224,7 +251,8 @@ for pic in glob.glob("*.png"):
 	if(index<1):
 		if not os.path.exists(pic[:-4]):
 			os.mkdir(pic[:-4])
-		splitImage(pic)
+		im=cv2.imread(pic,cv2.IMREAD_UNCHANGED)
+		splitImage(pic,im)
 		os.chdir("..")
 		#index+=1
 csvFile.close()
