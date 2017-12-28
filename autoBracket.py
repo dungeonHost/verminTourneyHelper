@@ -23,13 +23,14 @@ class autoBracket:
 		teamSize=ts
 		numRounds=nr
 		numPartis=np
-		
+
 	def createBracket(self):
 		global csvFile
 		global startFlag
 		global topFlag
 		global horzLineDist
 		global numPartis
+		global topPoints
 		if not os.path.exists("bracket"):
 			print("none")
 			exit()
@@ -77,7 +78,8 @@ class autoBracket:
 		fp=self.populateHorzBracket()
 		if numPartis>2:
 			self.populateVertBracket(fp)
-		
+		return topPoints
+
 	def populateHorzBracket(self):
 		point=topPoints[0]
 		point[0]-=50*teamSize

@@ -24,7 +24,7 @@ def tourneyHelper():
 		os.mkdir("bracket")
 	if not os.path.exists("vermin"):
 		os.mkdir("vermin")
-	#csvFile=open("bracket/bracket.csv","w+")
+	#csvFile=open("b2racket/bracket.csv","w+")
 	csvStrList=list()
 	totalDone=0
 	fileNameList=[f for f in os.walk(".").__next__()[2]if f[-4:]==".png"]
@@ -33,6 +33,7 @@ def tourneyHelper():
 	numRounds=ets.rounds
 	teamSize=ets.team
 	numPartis=ets.partis
+	root.quit()
 	print(len(fileNameList))
 	print((numPartis**numRounds)*teamSize)
 	try:
