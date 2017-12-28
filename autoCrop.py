@@ -2,12 +2,15 @@ import numpy as np
 import cv2
 import glob,os
 import tkinter as tk
-from tkinter import *
 from PIL import Image
 from PIL import ImageTk
+import PIL as pil
+import psutil
+from popupWindows import *
 
 lIndex=0
 pics=dict()
+csvStrArr=list()
 def pickImage(pictures,fullPic):
 	root=tk.Tk()
 	top=Frame(root)
@@ -16,23 +19,22 @@ def pickImage(pictures,fullPic):
 	images=dict()
 	picToKeep=list()
 	label=list()
+	global csvStrArr
 	global lIndex
 	
 	h,w,_=fullPic.shape
 	fpic=fullPic
-	if(w<h and w>400):
-		fpic=cv2.resize(fullPic,(400,int(400*(h/w))))
-	elif(h>400):
-		fpic=cv2.resize(fullPic,(int(400*(w/h)),400))
-	cv2.imshow("fullPic",fpic)
+	fpicImg=pil.Image.fromarray(fpic)
+	fpicImg.show()
+	#cv2.imshow("fullPic",fpic)
 	lIndex=0
-	labelText=["pick evo1 sprite","pick evo2 sprite","pick evo3 sprite","pick evo1 blast","pick evo2 blast","pick evo3 blast","pick any extra images"]
+	labelText=["pick evo1 sprite ","pick evo2 sprite ","pick evo3 sprite ","pick evo1 blast  ","pick evo2 blast  ","pick evo3 blast  ","pick extra images"]
 	label.append(Label(root,justify=LEFT,text=labelText[0]))
 	label[0].grid(row=0,column=0)
 	#label[0].pack(side=LEFT)
 	for pic in pictures:
 		pic=cv2.resize(pic,(60,60))
-		im=Image.fromarray(pic)
+		im=pil.Image.fromarray(pic)
 		images[index]=ImageTk.PhotoImage(im)
 		butts[index]=Button(root,justify=LEFT)
 		butts[index].config(image=images[index],width="60",height="60",command=lambda a=index: imageSelect(a,pictures,picToKeep,labelText,label,root))
@@ -48,24 +50,36 @@ def pickImage(pictures,fullPic):
 	back.grid(row=2,column=index-1)
 	#back.pack(side=LEFT)
 	root.mainloop()
-	cv2.destroyAllWindows()
-	return picToKeep
-	
+	#cv2.destroyAllWindows()
+	for proc in psutil.process_iter():
+		if proc.name() == "Microsoft.Photos.exe": #change this to default program used to display images
+			proc.kill()
+	fpicImg.close()
+	return picToKeep,csvStrArr
+
 def imageSelect(index,pictures,picToKeep,labelText,label,root):
 	global lIndex
 	global pics
+	global csvStrArr
 	lIndex+=1
 	if(index>=0):
-		print("INDEX="+str(index))
+		print("INDEX="+str(index)+" lIndex "+str(lIndex))
 		picToKeep.append(pictures[index])
 		#cv2.imshow("HI",pictures[index])
 		#cv2.waitKey(0)
 		im=cv2.resize(picToKeep[len(picToKeep)-1],(50,50))
-		pic=Image.fromarray(im)
+		pic=pil.Image.fromarray(im)
 		pics[lIndex]=ImageTk.PhotoImage(pic)
 		label.append(Label(root,justify=RIGHT))
 		label[len(label)-1].config(image=pics[lIndex])
 		label[len(label)-1].grid(row=9,column=lIndex)
+		if(lIndex<4):
+			enterStatWind=enterStatsNamesWindow(root)
+			root.wait_window(enterStatWind.top)
+			#Label(root,text=enterStatWind.csvString).pack()
+			csvStrArr.append(enterStatWind.csvString)
+			print("HELLO")
+			root.mainloop()
 	elif(index==-2):
 		lIndex-=1
 		print("LINDEX+"+str(lIndex)+" LEN="+str(len(label)))
@@ -80,6 +94,7 @@ def imageSelect(index,pictures,picToKeep,labelText,label,root):
 		label.append(Label(root,justify=RIGHT))
 		label[len(label)-1].config(text="NotFound")
 		label[len(label)-1].grid(row=9,column=lIndex)
+		picToKeep.append((np.ones((50,50,4),np.uint8)*255))
 	if(lIndex<7):
 		label[0].config(text=labelText[lIndex])
 	elif(index==-1):
@@ -93,17 +108,25 @@ def splitImage(fileName,im):
 	white=0
 	count=0
 	while(repeat==1):
-		w,h,_=im.shape
+		w,h,l=im.shape
 		im[0:w,0:white]=255
 		im[0:white,0:h]=255
 		imgray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
-		(thresh, im_bw) = cv2.threshold(imgray, 254, 255, cv2.THRESH_BINARY)
-		ret, thresh = cv2.threshold(imgray, 254, 255, cv2.THRESH_BINARY_INV)
 		ret, im_th = cv2.threshold(imgray, 254, 255, cv2.THRESH_BINARY_INV)
 		im_floodfill=im_th.copy()
 		h,w=im_th.shape[:2]
 		mask=np.zeros((h+2,w+2),np.uint8)
 		
+		if l>3:
+			b,g,r,a=cv2.split(im)
+			whiteImg=np.ones(im.shape,np.uint8)
+			whiteImg[:,:]=(255,255,255,0)
+			whiteMask=cv2.bitwise_and(whiteImg,whiteImg,mask=a)
+			whiteMask=cv2.bitwise_not(whiteMask)
+			b,g,r,a=cv2.split(whiteMask)
+			a[:]=0
+			whiteMask=cv2.merge((b,g,r,a),4)
+			cv2.addWeighted(whiteMask,1,im,1,0,im)
 		#make background transparent
 		cv2.floodFill(im_floodfill,mask,(0,0),255)
 		im_floodfill_inv = cv2.bitwise_not(im_floodfill)
@@ -111,19 +134,24 @@ def splitImage(fileName,im):
 		im_out2=cv2.bitwise_and(im,im,mask=mask[:-2,:-2])
 		im2=np.copy(im)
 		dst=cv2.add(im2,im_out2)
-		_,_,l=im.shape
+		w,h,l=im.shape
 		if(l==3):
 			b,g,r=cv2.split(im)
 			rgba=[b,g,r,im_out]
+			a=im_out
 		else:
 			b,g,r,a=cv2.split(im)
-			#im_out=cv2.bitwise_or(im_out,a)
-			h,w=a.shape
 			if(h*w-np.count_nonzero(a)<=50):
 				rgba=[b,g,r,im_out]#im_out]
 			else:
 				rgba=[b,g,r,a]
 		dst2=cv2.merge(rgba,4)
+		# for y in range(0,h):
+			# for x in range(0,w):
+				# if a[x, y] == 0:
+					# dst2[x, y] = (255, 255, 255, 0)
+		#a=cv2.bitwise_not(a)
+		#dst2=cv2.bitwise_or(dst2,dst2,mask=a)
 		im=dst2
 		w,h,_=im.shape
 		

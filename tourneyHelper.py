@@ -8,10 +8,11 @@ from PIL import ImageTk
 from math import ceil
 from autoBracket import autoBracket
 import autoCrop
+import random
 
-numRounds=3
-teamSize=2
-numPartis=3
+numRounds=5
+teamSize=1
+numPartis=2
 firstEvo=list()
 csvFile=open("bracket/bracket.csv","w+")
 
@@ -19,20 +20,31 @@ def tourneyHelper():
 	global csvFile
 	if not os.path.exists("bracket"):
 		os.mkdir("bracket")
+	if not os.path.exists("vermin"):
+		os.mkdir("vermin")
 	#csvFile=open("bracket/bracket.csv","w+")
 	csvStrList=list()
-	index=0
-	for fileName in glob.glob("*.png"):
-		#if(index<1):
-			if not os.path.exists(fileName[:-4]):
-				os.mkdir(fileName[:-4])
+	totalDone=0
+	fileNameList=[f for f in os.walk(".").__next__()[2]if f[-4:]==".png"]
+	print(len(fileNameList))
+	print((numPartis**numRounds)*teamSize)
+	try:
+		randList=random.sample(range(len(fileNameList)),(numPartis**numRounds)*teamSize)
+		pass
+	except ValueError:
+		randList=range(0,len(fileNameList))
+		pass
+	for fileName in fileNameList: #glob.glob("*.png"):
+		if(totalDone in randList):
+			#if not os.path.exists(fileName[:-4]):
+			#	os.mkdir(fileName[:-4])
 			im=cv2.imread(fileName,cv2.IMREAD_UNCHANGED)
 			crop_imgs=autoCrop.splitImage(fileName,im)
-			picToKeep=autoCrop.pickImage(crop_imgs,im)
+			picToKeep,vermString=autoCrop.pickImage(crop_imgs,im)
 			index=0
 			csvStr=""
 			for pic in picToKeep:
-				cv2.imwrite("sprite"+str(index)+".png",pic)
+				cv2.imwrite(fileName[:-4]+str(index)+".png",pic)
 				if(index<3):
 					if(index==0):
 						firstEvo.append(pic)
@@ -41,14 +53,19 @@ def tourneyHelper():
 					r_im=cv2.resize(pic,(50,50))
 					os.chdir("../bracket")
 					cv2.imwrite(fileName[:-4]+str(index)+".png",r_im)
+					
 					csvStr+=fileName[:-4]+str(index)+".png,"
-					os.chdir("../"+fileName[:-4])
+					if len(vermString)>index:
+						csvStr+=vermString[index]
+					os.chdir("../vermin")#fileName[:-4])
 					#cv2.imshow(fileName[:-4],pic)
 					cv2.waitKey(0)
 				index+=1
 			csvStr+="\n"
 			csvStrList.append(csvStr.split(","))
+			#print(vermString.split(","))
 			print(csvStr.split(","))
+			print(csvStrList)
 			#csvFile.write(csvStr)
 			cv2.imwrite(fileName,im)
 			os.chdir("../bracket")
@@ -56,13 +73,13 @@ def tourneyHelper():
 			cv2.waitKey(0)
 
 			os.chdir("..")
-			#index+=1
+		totalDone+=1
 	#csvFile.close()
 	if teamSize>=2:
 		createTeams(csvStrList)
 	else:
 		for csvStrArr in csvStrList:
-			line=",".join(csvStrList[0])
+			line=",".join(csvStrArr)
 			csvFile.write(line)
 	csvFile.close()
 	#crop_imgs=autoCrop.splitImage()

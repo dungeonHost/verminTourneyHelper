@@ -6,11 +6,6 @@ from tkinter import *
 from PIL import Image
 from PIL import ImageTk
 from math import ceil
-
-class testClass:
-	def testPrint():
-		print("hi")
-
 		
 numRounds=3
 teamSize=1
@@ -36,6 +31,7 @@ class autoBracket:
 		global horzLineDist
 		global numPartis
 		if not os.path.exists("bracket"):
+			print("none")
 			exit()
 		os.chdir("bracket")
 		prod=1
@@ -225,8 +221,9 @@ class autoBracket:
 		cv2.line(brack,(point[0],point[1]),(point[0],point[1]+dist*dir),(0,0,0),4)
 		point[1]+=dist*dir
 
-	# if not os.path.exists("bracket"):
-		# exit()
-	# os.chdir("bracket")
-	# csvFile=open("bracket.csv","r+")
-	# createBracket(numRounds,teamSize,numPartis)
+# if not os.path.exists("bracket"):
+	# exit()
+# os.chdir("bracket")
+# csvFile=open("bracket.csv","r+")
+# a=autoBracket(numRounds,teamSize,numPartis)
+# a.createBracket()
