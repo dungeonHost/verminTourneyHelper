@@ -9,6 +9,7 @@ from math import ceil
 from autoBracket import autoBracket
 import autoCrop
 import random
+from popupWindows import enterTourneySize
 
 numRounds=5
 teamSize=1
@@ -18,6 +19,7 @@ csvFile=open("bracket/bracket.csv","w+")
 
 def tourneyHelper():
 	global csvFile
+	root=tk.Tk()
 	if not os.path.exists("bracket"):
 		os.mkdir("bracket")
 	if not os.path.exists("vermin"):
@@ -26,6 +28,11 @@ def tourneyHelper():
 	csvStrList=list()
 	totalDone=0
 	fileNameList=[f for f in os.walk(".").__next__()[2]if f[-4:]==".png"]
+	ets=enterTourneySize(root)
+	root.wait_window(ets.top)
+	numRounds=ets.rounds
+	teamSize=ets.team
+	numPartis=ets.partis
 	print(len(fileNameList))
 	print((numPartis**numRounds)*teamSize)
 	try:
@@ -54,7 +61,7 @@ def tourneyHelper():
 					os.chdir("../bracket")
 					cv2.imwrite(fileName[:-4]+str(index)+".png",r_im)
 					
-					csvStr+=fileName[:-4]+str(index)+".png,"
+					csvStr+=os.getcwd()+fileName[:-4]+str(index)+".png,"
 					if len(vermString)>index:
 						csvStr+=vermString[index]
 					os.chdir("../vermin")#fileName[:-4])

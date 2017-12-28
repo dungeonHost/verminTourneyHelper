@@ -22,6 +22,7 @@ def pickImage(pictures,fullPic):
 	global csvStrArr
 	global lIndex
 	
+	csvStrArr=list()
 	h,w,_=fullPic.shape
 	fpic=fullPic
 	fpicImg=pil.Image.fromarray(fpic)
@@ -35,7 +36,7 @@ def pickImage(pictures,fullPic):
 	for pic in pictures:
 		pic=cv2.resize(pic,(60,60))
 		im=pil.Image.fromarray(pic)
-		images[index]=ImageTk.PhotoImage(im)
+		images[index]=ImageTk.PhotoImage(im,master=root)
 		butts[index]=Button(root,justify=LEFT)
 		butts[index].config(image=images[index],width="60",height="60",command=lambda a=index: imageSelect(a,pictures,picToKeep,labelText,label,root))
 		butts[index].grid(row=1+int(index/12),column=int(index%12))
@@ -69,7 +70,7 @@ def imageSelect(index,pictures,picToKeep,labelText,label,root):
 		#cv2.waitKey(0)
 		im=cv2.resize(picToKeep[len(picToKeep)-1],(50,50))
 		pic=pil.Image.fromarray(im)
-		pics[lIndex]=ImageTk.PhotoImage(pic)
+		pics[lIndex]=ImageTk.PhotoImage(pic,master=root)
 		label.append(Label(root,justify=RIGHT))
 		label[len(label)-1].config(image=pics[lIndex])
 		label[len(label)-1].grid(row=9,column=lIndex)
