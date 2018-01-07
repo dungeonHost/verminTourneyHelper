@@ -62,7 +62,7 @@ def tourneyHelper():
 					os.chdir("../bracket")
 					cv2.imwrite(fileName[:-4]+str(index)+".png",r_im)
 					
-					csvStr+=os.getcwd()+fileName[:-4]+str(index)+".png,"
+					csvStr+=os.getcwd()+"\\"+fileName[:-4]+str(index)+".png,"
 					if len(vermString)>index:
 						csvStr+=vermString[index]
 					os.chdir("../vermin")#fileName[:-4])
@@ -86,14 +86,29 @@ def tourneyHelper():
 	if teamSize>=2:
 		createTeams(csvStrList)
 	else:
+		csvFile.write("\n")
+		teamCounter=1
 		for csvStrArr in csvStrList:
 			line=",".join(csvStrArr)
 			csvFile.write(line)
+			if teamCounter%teamSize==0:
+				csvFile.write("\n")
+			teamCounter+=1
 	csvFile.close()
 	#crop_imgs=autoCrop.splitImage()
 	#autoBracket(number of rounds,team size,number of participants (1v1=2;1v1v1=3;etc.))
 	ab=autoBracket(numRounds,teamSize,numPartis)
-	ab.createBracket()
+	p=ab.createBracket()
+	svFile=open("bracketMetaData.csv","w+")
+	svFile.write(str(numRounds)+","+str(teamSize)+","+str(numPartis)+"\n")
+	for points in p:
+		pStr=str(points)
+		pStr=pStr.replace('[','')
+		pStr=pStr.replace(']','')
+		pStr=pStr.replace(' ','')
+		pStr=pStr.replace('\n','')
+		svFile.write(pStr)
+		svFile.write("\n")
 
 def createTeams(csvStrList):
 	global teamSize

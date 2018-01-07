@@ -15,6 +15,7 @@ topFlag=True
 horzLineDist=50
 vertLineDist=(70*numPartis)
 topPoints=list()
+bracketPoints=[list(),list(),list(),list()]
 class autoBracket:
 	def __init__(self,nr,ts,np):
 		global numRounds
@@ -78,7 +79,7 @@ class autoBracket:
 		fp=self.populateHorzBracket()
 		if numPartis>2:
 			self.populateVertBracket(fp)
-		return topPoints
+		return bracketPoints
 
 	def populateHorzBracket(self):
 		point=topPoints[0]
@@ -90,6 +91,7 @@ class autoBracket:
 		fp=open("bracket.csv","r+")
 		for line in fp:
 			splitString=line.split(',')
+			print(splitString)
 			pic=cv2.imread(splitString[0].rstrip(),cv2.IMREAD_UNCHANGED)
 			print(splitString[0])
 			alphS=pic[:,:,3]/255.0
@@ -147,6 +149,7 @@ class autoBracket:
 		global numPartis
 		global topPoints
 		global topFlag
+		global bracketPoints
 		point=[x,y]
 		if startFlag:
 			print("start")
@@ -154,6 +157,10 @@ class autoBracket:
 			self.drawLineHorz(point,int(1*hLD),dir,brack)
 			hLD=int(hLD/1.3)
 			startFlag=False
+			if(dir==-1):
+				bracketPoints[0].append(point[:])
+			else:
+				bracketPoints[1].append(point[:])
 			r-=1
 		prod=1
 		for i in range(r,1):
@@ -166,6 +173,10 @@ class autoBracket:
 		print("r="+str(r)+" hld="+str(hLD))
 		for i in range(0,numPartis):
 			self.drawLineHorz(point,hLD,dir,brack)
+			if(dir==-1):
+				bracketPoints[0].append(point[:])
+			else:
+				bracketPoints[1].append(point[:])
 			if(r>1):
 				self.drawBrackHorz(point[0],point[1],brack,dir,r-1,hLD)
 			elif(topFlag):
@@ -192,6 +203,10 @@ class autoBracket:
 			self.drawLineVert(point,int(1*hLD),dir,brack)
 			hLD=int(hLD/1.3)
 			startFlag=False
+			if(dir==-1):
+				bracketPoints[3].append(point[:])
+			else:
+				bracketPoints[2].append(point[:])
 			r-=1
 		prod=1
 		for i in range(r,1):
@@ -204,6 +219,10 @@ class autoBracket:
 		print("r="+str(r)+" x="+str(point[0]))
 		for i in range(0,numPartis):
 			self.drawLineVert(point,hLD,dir,brack)
+			if(dir==-1):
+				bracketPoints[3].append(point[:])
+			else:
+				bracketPoints[2].append(point[:])
 			if(r>1):
 				self.drawBrackVert(point[0],point[1],brack,dir,r-1,hLD)
 			elif(i==0 and topFlag):
