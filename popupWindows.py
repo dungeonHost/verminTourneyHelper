@@ -1,7 +1,30 @@
 import tkinter as tk
 from tkinter import *
 import sys
-import ctypes  # An included library with Python install.   
+import ctypes  # An included library with Python install.
+
+class enterTeamName(object):
+	teamName=""
+	def enter(self,event):
+		self.teamName=self.tNE.get()
+		if self.teamName!="":
+			self.top.destroy()
+		
+	def __init__(self,master,minPics): #self,tk.Tk,list of images,don't pass filenames
+		top=self.top=Toplevel(master)
+		self.top.attributes('-topmost',1)
+		minPicLabels=self.minPicLabels=list()
+		i=0
+		for pic in minPics:
+			minPicLabels.append(Label(top,image=pic))
+			minPicLabels[i].grid(row=0,column=i)
+			i+=1
+		instLabel=self.instLabel=Label(top,text="Enter team name: ")
+		instLabel.grid(row=1,column=0)
+		teamNameEntry=self.tNE=Entry(top)
+		teamNameEntry.grid(row=1,column=1)
+		teamNameEntry.bind("<Return>",self.enter)
+		teamNameEntry.focus_force()
 
 class enterTourneySize(object):
 	rounds=0
