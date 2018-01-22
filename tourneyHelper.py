@@ -20,6 +20,7 @@ csvFile=open("bracket/bracket.csv","w+")
 def tourneyHelper():
 	global csvFile
 	root=tk.Tk()
+	os.chdir("..")
 	if not os.path.exists("bracket"):
 		os.mkdir("bracket")
 	if not os.path.exists("vermin"):
@@ -33,7 +34,8 @@ def tourneyHelper():
 	numRounds=ets.rounds
 	teamSize=ets.team
 	numPartis=ets.partis
-	root.quit()
+	root.destroy()
+	
 	print(len(fileNameList))
 	print((numPartis**numRounds)*teamSize)
 	try:
@@ -86,29 +88,27 @@ def tourneyHelper():
 	if teamSize>=2:
 		createTeams(csvStrList)
 	else:
-		csvFile.write("\n")
-		teamCounter=1
+		teamCounter=0
 		for csvStrArr in csvStrList:
 			line=",".join(csvStrArr)
 			csvFile.write(line)
-			if teamCounter%teamSize==0:
-				csvFile.write("\n")
-			teamCounter+=1
 	csvFile.close()
 	#crop_imgs=autoCrop.splitImage()
 	#autoBracket(number of rounds,team size,number of participants (1v1=2;1v1v1=3;etc.))
 	ab=autoBracket(numRounds,teamSize,numPartis)
 	p=ab.createBracket()
 	svFile=open("bracketMetaData.csv","w+")
-	svFile.write(str(numRounds)+","+str(teamSize)+","+str(numPartis)+"\n")
+	svFile.write(str(teamSize)+","+str(numRounds)+","+str(numPartis)+"\n")
 	for points in p:
-		pStr=str(points)
-		pStr=pStr.replace('[','')
-		pStr=pStr.replace(']','')
-		pStr=pStr.replace(' ','')
-		pStr=pStr.replace('\n','')
-		svFile.write(pStr)
-		svFile.write("\n")
+		if len(points)>0:
+			pStr=str(points)
+			pStr=pStr.replace('[','')
+			pStr=pStr.replace(']','')
+			pStr=pStr.replace(' ','')
+			pStr=pStr.replace('\n','')
+			svFile.write(pStr)
+			svFile.write("\n")
+	svFile.write("0,")
 
 def createTeams(csvStrList):
 	global teamSize
@@ -198,6 +198,7 @@ def teamSelect(index,images,root,teamLabels,inst,team,csvStrList,butts):
 		
 		teamLabels[0].grid(row=1,column=0)
 		setUpButts(images,root,teamLabels,instruction,team,csvStrList,butts)
+		#csvFile.write("\n")
 		print("done")
 	print("hi")
 

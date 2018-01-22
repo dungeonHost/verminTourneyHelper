@@ -26,6 +26,28 @@ class enterTeamName(object):
 		teamNameEntry.bind("<Return>",self.enter)
 		teamNameEntry.focus_force()
 
+class pickWinners(object):
+	winnersIndex=(-1,-1)
+	def choice(self,index):
+		print("CHOUCE "+str(index))
+		winnersIndex=self.winnersIndex=index
+		if winnersIndex!=-1:
+			self.top.destroy()
+
+	def __init__(self,master,teamPics,indicies):
+		top=self.top=Toplevel(master)
+		self.top.attributes('-topmost',1)
+		teamLabels=self.teamLabels=list()
+		topLabel=self.topLabel=Label(top,text="PICK WINNER")
+		topLabel.grid(row=1,column=0)
+		i=0
+		for pic in teamPics:
+			print("popup "+str(indicies[i]))
+			teamLabels.append(Button(top))
+			teamLabels[i].config(image=pic,text=str(indicies[i]),command= lambda a=(indicies[i],i): self.choice(a))
+			teamLabels[i].grid(row=0,column=i)
+			i+=1
+
 class enterTourneySize(object):
 	rounds=0
 	partis=0
