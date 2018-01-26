@@ -180,4 +180,4 @@ def updateIndex(fileName,index,windicies):
 	lines[-1]+=",\n"
 	open(fileName,"w").write('\n'.join(lines))
 
-bracketUpdate()
+#bracketUpdate()

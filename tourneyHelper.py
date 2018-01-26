@@ -202,7 +202,7 @@ def teamSelect(index,images,root,teamLabels,inst,team,csvStrList,butts):
 		print("done")
 	print("hi")
 
-tourneyHelper()
+#tourneyHelper()
 # csvFile2=open("bracket/bracket2.csv","r+")
 # csvStrList=list()
 # for line in csvFile2:

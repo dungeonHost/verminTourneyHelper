@@ -178,4 +178,4 @@ def splitUpName(teamName):
 	teamNameSplit.append(teamName)
 	print("PLEN="+str(physicalLength))
 	return teamNameSplit,endLines,physicalLength
-setTeamNames()
+#setTeamNames()

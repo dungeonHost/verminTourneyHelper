@@ -3,6 +3,7 @@ from tkinter import *
 import sys
 import ctypes  # An included library with Python install.
 
+
 class enterTeamName(object):
 	teamName=""
 	def enter(self,event):
@@ -86,6 +87,25 @@ class enterTourneySize(object):
 		except ValueError:
 			ctypes.windll.user32.MessageBoxW(0, "Error: Not a Number", "Alert", 1)
 			return
+
+class pickCodeToRun(object):
+	codeChoice=0
+	def pick(self,choice):
+		self.codeChoice=choice
+		self.top.destroy()
+
+	def __init__(self,master):
+		top=self.top=Toplevel(master)
+		self.top.attributes('-topmost',1)
+		self.top.focus_force()
+		#self.instLabel=Label(top,text="Pick code to run")
+		#self.instLabel.grid(row=0,column=0)
+		self.startButt=Button(top,text="Start Tourney",command=lambda a=0:self.pick(a))
+		self.startButt.grid(row=0,column=0)
+		self.teamNamesButt=Button(top,text="Add Team Names",command=lambda a=1:self.pick(a))
+		self.teamNamesButt.grid(row=1,column=0)
+		self.updateButt=Button(top,text="Update Bracket",command=lambda a=2:self.pick(a))
+		self.updateButt.grid(row=2,column=0)
 
 class enterStatsNamesWindow(object):
 	csvString=""
