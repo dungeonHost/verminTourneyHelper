@@ -196,7 +196,7 @@ def splitImage(fileName,im):
 			cv2.floodFill(im_floodfill,mask,(0,0),255)
 		i+=1
 	index=0
-	os.chdir(fileName[:-4])
+	#os.chdir(fileName[:-4])
 	
 	ret, thresh = cv2.threshold(imSquares, 254, 255, cv2.THRESH_BINARY)
 	im2, contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -272,16 +272,16 @@ def splitImage(fileName,im):
 	# cv2.imwrite(fileName,im)
 	# cv2.waitKey(0)
 
-if not os.path.exists("bracket"):
-	os.mkdir("bracket")
-csvFile=open("bracket/bracket.csv","w+")
-index=0
-for pic in glob.glob("*.png"):
-	if(index<1):
-		if not os.path.exists(pic[:-4]):
-			os.mkdir(pic[:-4])
-		im=cv2.imread(pic,cv2.IMREAD_UNCHANGED)
-		splitImage(pic,im)
-		os.chdir("..")
-		#index+=1
-csvFile.close()
+# if not os.path.exists("bracket"):
+	# os.mkdir("bracket")
+# csvFile=open("bracket/bracket.csv","w+")
+# index=0
+# for pic in glob.glob("*.png"):
+	# if(index<1):
+		# if not os.path.exists(pic[:-4]):
+			# os.mkdir(pic[:-4])
+		# im=cv2.imread(pic,cv2.IMREAD_UNCHANGED)
+		# splitImage(pic,im)
+		# os.chdir("..")
+		# #index+=1
+# csvFile.close()

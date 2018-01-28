@@ -15,7 +15,6 @@ numRounds=5
 teamSize=1
 numPartis=2
 firstEvo=list()
-csvFile=open("bracket/bracket.csv","w+")
 
 def tourneyHelper():
 	global csvFile
@@ -23,8 +22,9 @@ def tourneyHelper():
 	os.chdir("..")
 	if not os.path.exists("bracket"):
 		os.mkdir("bracket")
-	if not os.path.exists("vermin"):
-		os.mkdir("vermin")
+	csvFile=open("bracket/bracket.csv","w+")
+	#if not os.path.exists("vermin"):
+	#	os.mkdir("vermin")
 	#csvFile=open("b2racket/bracket.csv","w+")
 	csvStrList=list()
 	totalDone=0
@@ -53,6 +53,7 @@ def tourneyHelper():
 			picToKeep,vermString=autoCrop.pickImage(crop_imgs,im)
 			index=0
 			csvStr=""
+			os.chdir("bracket")
 			for pic in picToKeep:
 				cv2.imwrite(fileName[:-4]+str(index)+".png",pic)
 				if(index<3):
@@ -61,13 +62,13 @@ def tourneyHelper():
 						#cv2.imshow(firstEvo[0])
 						#cv2.waitKey(0)
 					r_im=cv2.resize(pic,(50,50))
-					os.chdir("../bracket")
+					print(os.getcwd())
 					cv2.imwrite(fileName[:-4]+str(index)+".png",r_im)
 					
 					csvStr+=os.getcwd()+"\\"+fileName[:-4]+str(index)+".png,"
 					if len(vermString)>index:
 						csvStr+=vermString[index]
-					os.chdir("../vermin")#fileName[:-4])
+					#os.chdir("../vermin")#fileName[:-4])
 					#cv2.imshow(fileName[:-4],pic)
 					cv2.waitKey(0)
 				index+=1
@@ -78,7 +79,7 @@ def tourneyHelper():
 			print(csvStrList)
 			#csvFile.write(csvStr)
 			cv2.imwrite(fileName,im)
-			os.chdir("../bracket")
+			#os.chdir("../bracket")
 			cv2.imwrite(fileName,im)
 			cv2.waitKey(0)
 
