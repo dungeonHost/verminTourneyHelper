@@ -93,6 +93,7 @@ class autoBracket:
 			splitString=line.split(',')
 			print(splitString)
 			pic=cv2.imread(splitString[0].rstrip(),cv2.IMREAD_UNCHANGED)
+			pic=cv2.resize(pic,(50,50))
 			print(splitString[0])
 			alphS=pic[:,:,3]/255.0
 			alphL=1.0-alphS

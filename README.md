@@ -1,10 +1,13 @@
 VERMIN TOURNEY HELPER:
 
-made with python v. 3.5.1
+made with python v. 3.6.4
+
+includes python-opencv, pillow, glob, tkinter and psutil
 
 This project is a real piece of shit, expect it to work ~70% of the time
 
 It will
+
 solve the problem of croping individual vermin from the postrush, having to create/update the tourneys bracket, and save/update a file containing each vermins name, the path to their png image, and their stats (the user has to enter this)
 
 randomly select how ever many vermin from all vermin in a post rush
@@ -44,17 +47,23 @@ BE CAREFULL: the brackets image size scales exponentially with tourney size. Any
 
 5. Wait for a second then the first vermins image* and a popup window showing a bunch of bullshit will appear
 
-	5a. Follow instructions on the popup window and click the image that looks most like the first stage and another window will open
+	5a. Follow instructions on the popup window and click the image the first stages primary image and another window will open (the one that has an offwhite background [same color as the popup window] has a transparent background/is the better option, this is usually the second option)
 
 	5b. Enter in this stages's name and stats then hit enter
 
 	5c. do this for each of the stages (if each stage is not unique you can click the same image twice)
 
-	5d. after each stage has been entered then choose the blast sprites for each stage
+	5d. after each stage has been entered then choose the blast sprites for each stage (if all stages share the same blast just pick it multiple times)
 
-	5e. then click on any extra sprites that you want to save
+	5e. then click on any extra sprites (any sprite that is not the primary vermin body or its primary blast) that you want to save
+
+	5f. hit the "none" button to finish picking images
 
 6. repeat step 5 until all vermin have been entered
+
+* if the complete vermin image does not open then you'll need to change the program in code\autocrop.py line 56 to your PCs default image display program, then run the python code verminTourneyHelper.py (you'll need to  download python 3.6.4 and pip install any missing libraries)
+
+* I have no idea why the colors are messed up, the final image is in the appropriate colors
 
 Update a tournament with team names:
 
@@ -64,10 +73,11 @@ Update a tournament with team names:
 
 3. repeat step 2 for each team in the tournament
 
-* longer team names may obscure the team below, try not to make team names too long
+* longer team names (>28 characters) may obscure the team below, try not to make team names too long
 
 Update the tournament after a bout:
 
 1. double click verminTourneyHelper.exe choose "Add team names" from the popup window
 
 2. hit the winning vermin/teams image
+

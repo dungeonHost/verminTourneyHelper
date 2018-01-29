@@ -34,8 +34,8 @@ def pickImage(pictures,fullPic):
 	label[0].grid(row=0,column=0)
 	#label[0].pack(side=LEFT)
 	for pic in pictures:
-		pic=cv2.resize(pic,(60,60))
-		im=pil.Image.fromarray(pic)
+		picSmall=cv2.resize(pic,(60,60))
+		im=pil.Image.fromarray(picSmall)
 		images[index]=ImageTk.PhotoImage(im,master=root)
 		butts[index]=Button(root,justify=LEFT)
 		butts[index].config(image=images[index],width="60",height="60",command=lambda a=index: imageSelect(a,pictures,picToKeep,labelText,label,root))
@@ -86,6 +86,8 @@ def imageSelect(index,pictures,picToKeep,labelText,label,root):
 		print("LINDEX+"+str(lIndex)+" LEN="+str(len(label)))
 		if label[len(label)-1].cget("image")!='':
 			del picToKeep[-1]
+		if lIndex<=3:
+			del csvStrArr[-1]
 		label[len(label)-1].destroy()
 		del label[-1]
 		lIndex-=1
@@ -96,6 +98,8 @@ def imageSelect(index,pictures,picToKeep,labelText,label,root):
 		label[len(label)-1].config(text="NotFound")
 		label[len(label)-1].grid(row=9,column=lIndex)
 		picToKeep.append((np.ones((50,50,4),np.uint8)*255))
+		if(lIndex<4):
+			csvStrArr.append("NotFound,0,0,0,0,0,")
 	if(lIndex<7):
 		label[0].config(text=labelText[lIndex])
 	elif(index==-1):

@@ -3,7 +3,6 @@ from tkinter import *
 import sys
 import ctypes  # An included library with Python install.
 
-
 class enterTeamName(object):
 	teamName=""
 	def enter(self,event):

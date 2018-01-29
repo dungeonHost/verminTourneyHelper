@@ -61,9 +61,9 @@ def tourneyHelper():
 						firstEvo.append(pic)
 						#cv2.imshow(firstEvo[0])
 						#cv2.waitKey(0)
-					r_im=cv2.resize(pic,(50,50))
+					#r_im=cv2.resize(pic,(50,50))
 					print(os.getcwd())
-					cv2.imwrite(fileName[:-4]+str(index)+".png",r_im)
+					cv2.imwrite(fileName[:-4]+str(index)+".png",pic)#r_im)
 					
 					csvStr+=os.getcwd()+"\\"+fileName[:-4]+str(index)+".png,"
 					if len(vermString)>index:
