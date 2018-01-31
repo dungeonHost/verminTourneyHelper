@@ -18,6 +18,7 @@ firstEvo=list()
 
 def tourneyHelper():
 	global csvFile
+	global teamSize
 	root=tk.Tk()
 	os.chdir("..")
 	if not os.path.exists("bracket"):
@@ -128,7 +129,9 @@ def createTeams(csvStrList):
 	instruction.grid(row=0,column=0)
 	
 	teamLabels.append(Label(root,justify=LEFT,text="hi"))
-	images.append(PhotoImage(file=csvStrList[0][0]))
+	#image=tk.PhotoImage(file=csvStrList[0][0])
+	#zoom=[60/image.width(),60/image.height()]
+	images.append(tk.PhotoImage(file=csvStrList[0][0]))
 	line=",".join(csvStrList[0])
 	csvFile.write(line)
 	teamLabels[0].config(image=images[0])
@@ -145,11 +148,14 @@ def createTeams(csvStrList):
 def setUpButts(images,root,teamLabels,instruction,team,csvStrList,butts):
 	index=0
 	for pic in csvStrList:
-		# img=cv2.resize(firstEvo[index],(60,60))
-		# fs=Image.fromarray(img)
-		# pic=cv2.resize(pic,(60,60))
-		# im=Image.fromarray(pic)
-		images.append(PhotoImage(file=csvStrList[index][0]))#ImageTk.PhotoImage(im)
+		#img=cv2.resize(firstEvo[index],(60,60))
+		#fs=Image.fromarray(img)
+		print("PIC")
+		print(pic)
+		pic=cv2.imread(pic[0],cv2.IMREAD_UNCHANGED)
+		pic=cv2.resize(pic,(60,60))
+		im=Image.fromarray(pic)
+		images.append(ImageTk.PhotoImage(im))#ImageTk.PhotoImage(im)
 		butts.append(Button(root,justify=LEFT))
 		butts[index].config(image=images[index+1],width="60",height="60",command=lambda a=index: teamSelect(a,images,root,teamLabels,instruction,team,csvStrList,butts))
 		butts[index].grid(row=2+int(index/12),column=int(index%12))
@@ -159,14 +165,15 @@ def teamSelect(index,images,root,teamLabels,inst,team,csvStrList,butts):
 	global teamSize
 	global csvFile
 	teamLabels.append(Label(root,justify=LEFT))
-	teamLabels[len(teamLabels)-1].config(image=images[index])
+	teamLabels[len(teamLabels)-1].config(image=images[index+1])
 	teamLabels[len(teamLabels)-1].grid(row=1,column=len(teamLabels)-1)
 	inst.config(text="pick "+str(teamSize-len(team))+" teamates")
 	team.append(csvStrList[index])
+	print("teamsize,TEAM LENGTH,index\n"+str((teamSize,len(team),index)))
+	print(len(csvStrList))
+	print(team)
 	if len(team)>=(teamSize-1):
 		index=0
-		print(len(csvStrList))
-		print(team)
 		for csvStrArr in team:
 			line=",".join(csvStrArr)
 			csvFile.write(line)
@@ -187,7 +194,9 @@ def teamSelect(index,images,root,teamLabels,inst,team,csvStrList,butts):
 		team=list()
 		
 		print(csvStrList)
-		images.append(PhotoImage(file=csvStrList[0][0]))
+		#image=tk.PhotoImage(file=csvStrList[0][0])
+		#zoom=[60/image.width(),60/image.height()]
+		images.append(tk.PhotoImage(file=csvStrList[0][0]))
 		instruction=Label(root,justify=LEFT,text="pick "+str(teamSize-1)+" teamates")
 		instruction.grid(row=0,column=0)
 		teamLabels.append(Label(root,justify=LEFT,text="hi"))
@@ -202,6 +211,7 @@ def teamSelect(index,images,root,teamLabels,inst,team,csvStrList,butts):
 		#csvFile.write("\n")
 		print("done")
 	print("hi")
+
 
 #tourneyHelper()
 # csvFile2=open("bracket/bracket2.csv","r+")
