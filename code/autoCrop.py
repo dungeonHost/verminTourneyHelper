@@ -77,10 +77,8 @@ def imageSelect(index,pictures,picToKeep,labelText,label,root):
 		if(lIndex<4):
 			enterStatWind=enterStatsNamesWindow(root)
 			root.wait_window(enterStatWind.top)
-			#Label(root,text=enterStatWind.csvString).pack()
 			csvStrArr.append(enterStatWind.csvString)
-			print("HELLO")
-			root.mainloop()
+			#root.mainloop()
 	elif(index==-2):
 		lIndex-=1
 		print("LINDEX+"+str(lIndex)+" LEN="+str(len(label)))

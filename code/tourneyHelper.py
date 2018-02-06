@@ -24,9 +24,6 @@ def tourneyHelper():
 	if not os.path.exists("bracket"):
 		os.mkdir("bracket")
 	csvFile=open("bracket/bracket.csv","w+")
-	#if not os.path.exists("vermin"):
-	#	os.mkdir("vermin")
-	#csvFile=open("b2racket/bracket.csv","w+")
 	csvStrList=list()
 	totalDone=0
 	fileNameList=[f for f in os.walk(".").__next__()[2]if f[-4:]==".png"]
@@ -45,10 +42,8 @@ def tourneyHelper():
 	except ValueError:
 		randList=range(0,len(fileNameList))
 		pass
-	for fileName in fileNameList: #glob.glob("*.png"):
+	for fileName in fileNameList:
 		if(totalDone in randList):
-			#if not os.path.exists(fileName[:-4]):
-			#	os.mkdir(fileName[:-4])
 			im=cv2.imread(fileName,cv2.IMREAD_UNCHANGED)
 			crop_imgs=autoCrop.splitImage(fileName,im)
 			picToKeep,vermString=autoCrop.pickImage(crop_imgs,im)
@@ -57,32 +52,17 @@ def tourneyHelper():
 			os.chdir("bracket")
 			for pic in picToKeep:
 				cv2.imwrite(fileName[:-4]+str(index)+".png",pic)
-				if(index<3):
-					if(index==0):
-						firstEvo.append(pic)
-						#cv2.imshow(firstEvo[0])
-						#cv2.waitKey(0)
-					#r_im=cv2.resize(pic,(50,50))
-					print(os.getcwd())
-					cv2.imwrite(fileName[:-4]+str(index)+".png",pic)#r_im)
-					
-					csvStr+=os.getcwd()+"\\"+fileName[:-4]+str(index)+".png,"
-					if len(vermString)>index:
-						csvStr+=vermString[index]
-					#os.chdir("../vermin")#fileName[:-4])
-					#cv2.imshow(fileName[:-4],pic)
-					cv2.waitKey(0)
+				#if(index<3):
+				print(os.getcwd())
+				cv2.imwrite(fileName[:-4]+str(index)+".png",pic)
+				csvStr+=os.getcwd()+"\\"+fileName[:-4]+str(index)+".png,"
+				if len(vermString)>index:
+					csvStr+=vermString[index]
+				cv2.waitKey(0)
 				index+=1
 			csvStr+="\n"
 			csvStrList.append(csvStr.split(","))
-			#print(vermString.split(","))
-			print(csvStr.split(","))
-			print(csvStrList)
-			#csvFile.write(csvStr)
 			cv2.imwrite(fileName,im)
-			#os.chdir("../bracket")
-			cv2.imwrite(fileName,im)
-			cv2.waitKey(0)
 
 			os.chdir("..")
 		totalDone+=1

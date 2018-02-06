@@ -15,7 +15,6 @@ def bracketUpdate():
 	points,[teamSize,numRounds,numPartis],picFilenames,index,teamNames,windicies=metaBracketReader.readAllBrackets("bracketMetaData.csv","bracket.csv")
 	i=0
 	print("index="+str(index))
-	picList=list()
 	root=tk.Tk()
 	round=0
 	#i=int(index/(numPartis**(numRounds-1)))
@@ -27,70 +26,13 @@ def bracketUpdate():
 		i-=j
 		k+=1
 		j=(numPartis**(numRounds-k))
-	print("ROUND="+str(round))
-	picIndicies=list()
 	if index<numPartis**(numRounds-1):
-		teamPic=PIL.Image.new('RGB',(50*teamSize+10,60))
-		offset=0
-		i=0
-		j=0
-		indx=index*numPartis*teamSize
-		print("INDX="+str(indx))
-		for picFile in picFilenames[0][indx:indx+numPartis*teamSize]:
-			if teamSize<2:
-				picList.append(PIL.ImageTk.PhotoImage(PIL.Image.open(picFile)))
-				picIndicies.append(indx+i)
-				i+=1
-			else:
-				teamPic.paste(PIL.Image.open(picFile),(offset,0))
-				offset+=50
-				i+=1
-				if i>=teamSize:
-					picList.append(PIL.ImageTk.PhotoImage(teamPic))
-					offset=0
-					picIndicies.append(indx+j)
-					j+=teamSize
-					i=0
+		picList,picIndicies=createPicList(index,numPartis,teamSize,round,numRounds,picFilenames)
 	else:
-		teamPic=PIL.Image.new('RGB',(50*teamSize+10,60))
-		offset=0
-		#indx=(index-(numPartis**(numRounds-1))*(round))*(numPartis+teamSize)
-		indx=(index-(numPartis**(numRounds-1)))*numPartis*teamSize
-		print("INDX="+str(indx))
-		count=0
-		j=0
-		r=round
-		if round>=3:
-			r=2
-		for i in range(0,numPartis*teamSize):
-			if teamSize<2:
-				image=PIL.Image.open(picFilenames[r][windicies[indx+i]])
-				print("INDXII "+str(indx+i)+" "+str(windicies[indx+i]))
-				picList.append(PIL.ImageTk.PhotoImage(image))
-				picIndicies.append(windicies[indx+i])
-			else:
-				print("WJID "+str((windicies[indx]+j,indx,j)))
-				image=PIL.Image.open(picFilenames[r][windicies[indx]+j])
-				teamPic.paste(image,(offset,0))
-				offset+=50
-				count+=1
-				j+=1
-				if count>=teamSize:
-					j=0
-					picIndicies.append(windicies[indx])
-					indx+=1
-					picList.append(PIL.ImageTk.PhotoImage(teamPic))
-					offset=0
-					count=0
+		picList,picIndicies=createPicListHighRound(index,numPartis,teamSize,round,numRounds,windicies,picFilenames)
 	pw=pickWinners(root,picList,picIndicies)
 	root.wait_window(pw.top)
-	print("WINNER="+str(pw.winnersIndex))
-	print(teamSize)
 	bIndx=int(math.floor(index/numPartis**(numRounds-(2+round)))%numPartis)
-	print(numPartis**(round+1))
-	print(windicies)
-	print(bIndx)
-	print("PICIND="+str(picIndicies))
 	if round==0:
 		winx=updateBracket(index%(numPartis**(numRounds-2)),points,picFilenames,pw.winnersIndex,round,[teamSize,numRounds,numPartis],bIndx,windicies)
 	else:
@@ -100,6 +42,68 @@ def bracketUpdate():
 	print("WINDING")
 	print(windicies)
 	updateIndex("bracketMetaData.csv",index+1,windicies)
+
+def createPicList(index,indx,numPartis,teamSize,round,numRounds,picFilenames):
+	teamPic=PIL.Image.new('RGB',(50*teamSize+10,60))
+	offset=0
+	i=0
+	j=0
+	picList=list()
+	picIndicies=list()
+	indx=index*numPartis*teamSize
+	for picFile in picFilenames[0][indx:indx+numPartis*teamSize]:
+		if teamSize<2:
+			resizePic=PIL.Image.open(picFile)
+			resizePic=resizePic.resize((60,60))
+			picList.append(PIL.ImageTk.PhotoImage(resizePic))
+			picIndicies.append(indx+i)
+			i+=1
+		else:
+			teamPic.paste(PIL.Image.open(picFile),(offset,0))
+			offset+=50
+			i+=1
+			if i>=teamSize:
+				teamPic=teamPic.resize((60,60*teamSize))
+				picList.append(PIL.ImageTk.PhotoImage(teamPic))
+				offset=0
+				picIndicies.append(indx+j)
+				j+=teamSize
+				i=0
+	return picList,picIndicies
+	
+def createPicListHighRound(index,numPartis,teamSize,round,numRounds,windicies,picFilenames):
+	teamPic=PIL.Image.new('RGB',(50*teamSize+10,60))
+	offset=0
+	count=0
+	j=0
+	picList=list()
+	picIndicies=list()
+	indx=(index-(numPartis**(numRounds-1)))*numPartis*teamSize
+	r=round
+	if round>=3:
+		r=2
+	for i in range(0,numPartis*teamSize):
+		if teamSize<2:
+			image=PIL.Image.open(picFilenames[r][windicies[indx+i]])
+			image=image.resize((60,60))
+			print("INDXII "+str(indx+i)+" "+str(windicies[indx+i]))
+			picList.append(PIL.ImageTk.PhotoImage(image))
+			picIndicies.append(windicies[indx+i])
+		else:
+			print("WJID "+str((windicies[indx]+j,indx,j)))
+			image=PIL.Image.open(picFilenames[r][windicies[indx]+j])
+			teamPic.paste(image,(offset,0))
+			offset+=50
+			count+=1
+			j+=1
+			if count>=teamSize:
+				j=0
+				picIndicies.append(windicies[indx])
+				indx+=1
+				teamPic=teamPic.resize((60,60*teamSize))
+				picList.append(PIL.ImageTk.PhotoImage(teamPic))
+				offset=0
+				count=0
 
 def updateBracket(index,points,picList,winner,round,tRP,bIndx,windex):
 	windicies=list()
@@ -158,6 +162,7 @@ def updateBracket(index,points,picList,winner,round,tRP,bIndx,windex):
 	else:
 		print(picList[round+1][picIndex])
 		pic=cv2.imread(picList[round+1][picIndex],cv2.IMREAD_UNCHANGED)
+		pic=cv2.resize(pic,(50,50))
 		print(str((p1,p2,brack.shape)))
 		brack[p2:p2+50,p1:p1+50]=pic
 		windicies.append(picIndex)
