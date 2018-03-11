@@ -10,7 +10,7 @@ from popupWindows import *
 
 lIndex=0
 pics=dict()
-csvStrArr=list()
+statList=list()
 def pickImage(pictures,fullPic):
 	root=tk.Tk()
 	top=Frame(root)
@@ -19,10 +19,11 @@ def pickImage(pictures,fullPic):
 	images=dict()
 	picToKeep=list()
 	label=list()
-	global csvStrArr
+	global statList
 	global lIndex
 	
-	csvStrArr=list()
+	statList=list()
+	print("SL "+str(statList))
 	h,w,_=fullPic.shape
 	fpic=fullPic
 	fpicImg=pil.Image.fromarray(fpic)
@@ -56,12 +57,13 @@ def pickImage(pictures,fullPic):
 		if proc.name() == "Microsoft.Photos.exe": #change this to default program used to display images
 			proc.kill()
 	fpicImg.close()
-	return picToKeep,csvStrArr
+	return picToKeep,statList
 
 def imageSelect(index,pictures,picToKeep,labelText,label,root):
 	global lIndex
 	global pics
-	global csvStrArr
+	global statList
+	print("SL "+str(statList))
 	lIndex+=1
 	if(index>=0):
 		print("INDEX="+str(index)+" lIndex "+str(lIndex))
@@ -75,17 +77,19 @@ def imageSelect(index,pictures,picToKeep,labelText,label,root):
 		label[len(label)-1].config(image=pics[lIndex])
 		label[len(label)-1].grid(row=9,column=lIndex)
 		if(lIndex<4):
-			enterStatWind=enterStatsNamesWindow(root)
-			root.wait_window(enterStatWind.top)
-			csvStrArr.append(enterStatWind.csvString)
+#*****************************************************FIXX THISS*************************
+			#enterStatWind=enterStatsNamesWindow(root)
+			#root.wait_window(enterStatWind.top)
+			#statList.append(enterStatWind.statList)
 			#root.mainloop()
+			statList.append(['NotFound',0,0,0,0,0,])
 	elif(index==-2):
 		lIndex-=1
 		print("LINDEX+"+str(lIndex)+" LEN="+str(len(label)))
 		if label[len(label)-1].cget("image")!='':
 			del picToKeep[-1]
 		if lIndex<=3:
-			del csvStrArr[-1]
+			del statList[-1]
 		label[len(label)-1].destroy()
 		del label[-1]
 		lIndex-=1
@@ -97,7 +101,7 @@ def imageSelect(index,pictures,picToKeep,labelText,label,root):
 		label[len(label)-1].grid(row=9,column=lIndex)
 		picToKeep.append((np.ones((50,50,4),np.uint8)*255))
 		if(lIndex<4):
-			csvStrArr.append("NotFound,0,0,0,0,0,")
+			statList.append(['NotFound',0,0,0,0,0,])
 	if(lIndex<7):
 		label[0].config(text=labelText[lIndex])
 	elif(index==-1):

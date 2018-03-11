@@ -92,7 +92,13 @@ Update the tournament after a bout:
 
 3. After doing this bracket/bracket.png will be updated with an x next to the team that lost and the winning team moving forward. It will also update BracketMetaData.csv with the winners bracket.csv line number (for teams this number will be the first member in the team)
 
-CSV file format:
+FILES/IMAGES:
+
+bracket.png:
+
+	The bracket for the tourney, split into 2-4 individual "trees" that meet in the middle
+
+	If you want to you can modify the bracket to add a title/pictures or a loosers bracket, just don't change bracket.png's width or where the trees are located
 
 bracket.csv:
 
@@ -104,10 +110,23 @@ bracketMetaData.csv:
 	
 	line1: team size,number of rounds,number of partisipants (xvx=2, xvxvx=3)
 	
-	line 2-5: end points of the bracket lines (where vermin are placed on the bracket)
+	line 2-5: end point for each branch drawn in the bracket, each line represents one "tree" from the bracket (i.e. the right and left trees in a 2 partisipant tourney will have their endpoints stored in line 1 and 2 respectively)
 	
-	last line: match number, the winner's line number for each match
-	
+	last line: match number, the winner of each matches line number in bracket.csv (the last number is the latest matches winner's number, line number belongs to the first vermin in the team)
+
 teamnames.csv:
 	
 	contains team names ordered the same way as vermin in bracket.csv (so for a tourney with teamsize of 2 the first name in teamnames.csv belongs to the first two vermin in bracket.csv)
+
+
+KNOWN PROBLEMS:
+
+	Hitting bracket update will not work for the final match in the tourney (the point at the root of a bracket 'tree' is not saved in bracketMetaData.csv and I'm too lazy to fix all this shit to add it in, just open it in paint)
+	
+	If a vermin is made of tiny pieces with space inbetween them then they will not be cropped correctly
+
+	If the background of a vermin image is not white or transparent it will not be cropped correctly
+
+	If the vermin/blast is drawn inside of a box, then the box will be cropped out with all the white space intact
+
+	The bracket image (bracket.png) is way bigger than it needs to be for larger tournamnets, anything with over 5 rounds will more than likely cause problems (so don't ask for it)

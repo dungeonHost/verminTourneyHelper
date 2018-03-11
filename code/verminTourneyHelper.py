@@ -5,7 +5,7 @@ import tourneyHelper
 import setTeamNames
 from popupWindows import pickCodeToRun
 
-
+print("VERMIN TOURNEY HELPER v1.0")
 root=tk.Tk()
 pctr=pickCodeToRun(root)
 root.wait_window(pctr.top)
